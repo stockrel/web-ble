@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Meerky</title>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta name="description" content="Meerky Healthbox" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-inverse" style="margin-bottom:20px">
+      <a class="navbar-brand" href="#">
+        <img src="/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+        Meerky
+      </a>
+       <ul class="nav navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Performance tests</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Measures</a>
+        </li>
+      </ul> 
+      <span class="navbar-text float-xs-right text-muted">
+        <span id="device">No device appaired &nbsp;</span>
+        <button class="btn btn-primary" onclick="requestAndConnectDevice();" id="appairingbutton">Pair device</button>
+      </span>   
+    </nav>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="jumbotron col-xs-12 col-sm-10 offset-sm-1">
+         <!--  <img src="/img/logo.png" width="70" height="70" class="d-inline-block" alt=""> -->
+          <h1 class="display-3">           
+            Welcome to Meerky
+          </h1>
+          <p class="lead">Just Check It - Your Immediate Environment that may impact your Health</p>
+          <hr class="my-2">
+          <div class="row">
+            <div class="card card-block col-sm-4">
+              <h4 class="card-title"><i class="fa fa-thermometer-three-quarters" aria-hidden="true"></i>&nbsp;Temperature</h4>
+              <p class="card-subtitle text-muted">Temperature around your healthbox</p>
+              <p class="card-text float-xs-center" id="tempResult">
+                <!-- <h1 class="display-3 text-xs-center">           
+                  -<small>°C</small>
+                </h1> -->
+              </p>
+              <small class="text-muted float-xs-left" id="temperatureId"></small>
+              <a class="btn btn-sm btn-success float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0105');">Update</a>
+            </div>
+             <div class="card card-block col-sm-4">
+              <h4 class="card-title"><i class="fa fa-cloud" aria-hidden="true"></i>&nbsp;Pressure</h4>
+              <p class="card-subtitle text-muted">Atmospheric pressure around your healthbox</p>
+              <p class="card-text float-xs-center" id="pressureResult">
+                <!-- <h1 class="display-3 text-xs-center">           
+                  -<small>hPa</small>
+                </h1> -->
+              </p>
+              <small class="text-muted float-xs-left" id="pressureId"></small>
+              <a class="btn btn-sm btn-success float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0106');">Update</a>
+            </div>
+            <div class="card card-block col-sm-4">
+              <h4 class="card-title"><i class="fa fa-tint" aria-hidden="true"></i>&nbsp;Humidity</h4>
+              <p class="card-subtitle text-muted">Humidity percentage around your healthbox</p>
+              <p class="card-text float-xs-center" id="humidityResult">
+                <!-- <h1 class="display-3 text-xs-center">           
+                  -<small>%</small>
+                </h1> -->
+              </p>
+              <small class="text-muted float-xs-left" id="humidityId"></small>
+              <a class="btn btn-sm btn-success float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0107');">Update</a>
+            </div>
+          </div>
+          <div class="row"> 
+            <div class="card card-block col-xs-6">
+              <h4 class="card-title"><i class="fa fa-signal" aria-hidden="true"></i>&nbsp;Radio frequencies</h4>
+              <h6 class="card-subtitle text-muted">Measure the strength of the ambient radio frequencies you are exposed to</h6>
+              <p class="card-text float-xs-center" id="rfResult">
+                <!-- <h1 class="display-3 text-xs-center">           
+                  -<small>%</small>
+                </h1> -->
+              </p>
+              <a class="btn btn-sm btn-danger float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0101');">Measure</a>
+            </div>
+            <div class="card card-block col-xs-6">
+              <h4 class="card-title"><i class="fa fa-sun-o" aria-hidden="true"></i>&nbsp;UV indexes</h4>
+              <h6 class="card-subtitle text-muted">Measure UV indexes you are exposed to</h6>
+              <p class="card-text float-xs-center row" id="uvResult">
+                 <h3 class="display-5 text-xs-center col-sm-4" id="uvaResult">           
+                 <!--  UVA<small>µWatts/cm2</small> -->
+                </h3>
+                <h3 class="display-5 text-xs-center col-sm-4" id="uvbResult">           
+                  <!-- UVB<small>µWatts/cm2</small> -->
+                </h3>
+                <h3 class="display-5 text-xs-center col-sm-4" id="uviResult">           
+                  <!-- <small>UV index</small> -->
+                </h3>
+              </p>
+               <a class="btn btn-sm btn-warning float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0104');">Measure UVI</a>
+              <a class="btn btn-sm btn-warning float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0103');">Measure UVB</a>
+              <a class="btn btn-sm btn-warning float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0102');">Measure UVA</a>
+            </div>
+            <div class="row"> 
+              <div class="collapse col-sm-12 col-xs-12" id="collapseExample">
+                <div class="card card-block">
+                    <h4 class="card-title"><i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;Results</h4>
+                    <h6 class="card-subtitle text-muted">Measure #1234</h6>
+                    <p class="card-text float-xs-center">
+                      <h1 class="display-3 text-xs-center col-xs-3">           
+                        78<small>%</small>
+                      </h1>
+                      <div id="chartdiv" class="col-xs-9" style="width:400px;height:400px;"></div>
+                    </p>
+                    
+                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+                </div>
+              </div>
+
+            </div>
+         <!--  </div> -->
+          <div class="row">
+            <div class="col-xs-12">
+              <span id="console"></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-3">
+
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js" integrity="sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js" integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/2141881a20.js"></script>
+    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+    <script type="text/javascript">
+      var bluetoothDevice;
+      var batteryLevelCharacteristic;
+      var consoleSpan = $("#console");
+      var fifoCharacteristic;
+      var requestID = 1234;
+      var measures = [];
+
+      function requestAndConnectDevice() {
+        return (bluetoothDevice ? Promise.resolve() : requestDevice())
+        .then(connectDevice)
+        .then(_ => {
+          // $("<span>Device connected</span>").appendTo("#console")
+          // $("<span>"+parseInt("0x2456e1b926e28f83e744f34f01e9d701")+"</span>").appendTo("#console");
+          console.log('Connected to device');
+          return "connected";
+        })
+        .catch(error => {
+          alert('Argh! ' + error);
+        });
+      }
+
+      function requestDevice() {
+        console.log('Requesting Bluetooth Device...');
+        return navigator.bluetooth.requestDevice({filters: [{services: [0x1101,'00001101-0000-1000-8000-00805f9b34fb']}]})
+        .then(device => {
+          bluetoothDevice = device;
+          //bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
+        });
+      }
+
+      function connectDevice() {
+        if (bluetoothDevice.gatt.connected) {
+          return Promise.resolve();
+        }
+        // $("<span>Connecting to GATT Server...<br></span>").appendTo("#console");
+
+        console.log('Connecting to GATT Server...');
+        return bluetoothDevice.gatt.connect()
+        .then(server => {
+          $("#device").html("Appaired to <b style='color:white;'>"+bluetoothDevice.name+"</b>")
+          $("#appairingbutton").html("Unpair device")
+          $("#appairingbutton").removeClass("btn-primary")
+          $("#appairingbutton").addClass("btn-danger")
+          $(".btn-measure").removeClass("disabled")
+          // $("<span>Getting primary Service...<br></span>").appendTo("#console");
+          console.log('Getting primary Service...');
+          return server.getPrimaryService('00001101-0000-1000-8000-00805f9b34fb');
+        })
+        .then(service => {
+          // $("<span>Getting FIFO Characteristic...<br></span>").appendTo("#console");
+          console.log('Getting FIFO Characteristic...');
+          return service.getCharacteristic('2456e1b9-26e2-8f83-e744-f34f01e9d703');
+        })
+        .then(characteristic => {
+          fifoCharacteristic = characteristic;
+          return fifoCharacteristic.addEventListener('characteristicvaluechanged',handleNotifications);
+        })
+        .then(_ => {
+          // requestID++;
+          // console.log('Your measure has been sent to Meerky Healthbox');
+
+          return fifoCharacteristic.startNotifications()
+        })
+        .then(_ => {
+          console.log('> Notifications started');
+        })
+        // .then(_ => {
+        //   fifoCharacteristic.writeValue(new Uint16Array([parseInt(0x0105, 16),parseInt(0001, 16),parseInt(0x0106, 16),parseInt(0002, 16),parseInt(0x0107, 16),parseInt(0001, 16)]).buffer)
+        //   .then(_ => {
+        //     requestID++;
+        //     console.log('Your measure has been sent to Meerky Healthbox');
+        //     return fifoCharacteristic.startNotifications()
+        //   })
+        //   .then(_ => {
+        //     console.log('> Notifications started');
+        //   })
+        //   .catch(error => {
+        //     log('Argh! ' + error);
+        //   });
+        // })
+      }
+
+      $( "#environment" ).click(function() {
+        write()
+      });
+
+      function hexToBytes(hex) {
+          for (var bytes = [], c = 0; c < hex.length; c += 2)
+          bytes.push(parseInt(hex.substr(c, 2), 16));
+          return bytes;
+      }
+
+      // Convert a byte array to a hex string
+      function bytesToHex(bytes) {
+          for (var hex = [], i = 0; i < bytes.length; i++) {
+              hex.push((bytes[i] >>> 4).toString(16));
+              hex.push((bytes[i] & 0xF).toString(16));
+          }
+          return hex.join("");
+      }
+
+      function str2ab(str) {
+        var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+        var bufView = new Uint16Array(buf);
+        for (var i=0, strLen=str.length; i < strLen; i++) {
+          bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
+      }
+
+      function ab2str(buf) {
+        console.log(buf)
+        console.log(buf.length);
+        console.log(new Uint16Array(buf))
+        for (var i=0;i<4;i++){
+          console.log(buf[i].toString());
+        }
+        return "toto";
+      }
+
+
+
+      function writeToDevice(hex) {
+        // makeChart();
+        // $('#collapseExample').collapse('toggle');
+        measures.push({
+          requestID: requestID,
+          requestTypeId: hex,
+          result: null
+        })
+        fifoCharacteristic.writeValue(new Uint16Array([parseInt(hex, 16),parseInt(requestID, 16)]).buffer)
+        .then(_ => {
+          requestID++;
+          console.log('Your measure has been sent to Meerky Healthbox');
+          // return fifoCharacteristic.startNotifications()
+        })
+        // .then(_ => {
+        //   console.log('> Notifications started');
+        // })
+        .catch(error => {
+          log('Argh! ' + error);
+        });
+
+        //$("<span>"+res+"<br></span>").appendTo("#console");
+      }
+
+      /* This function will be called when `readValue` resolves and
+       * characteristic value changes since `characteristicvaluechanged` event
+       * listener has been added. */
+      function handleBatteryLevelChanged(event) {
+        let batteryLevel = event.target.value.getUint8(0);
+        log('> Battery Level is ' + batteryLevel + '%');
+      }
+
+      function onStartNotificationsButtonClick() {
+        log('Starting Battery Level Notifications...');
+        batteryLevelCharacteristic.startNotifications()
+        .then(_ => {
+          log('> Notifications started');
+          document.querySelector('#startNotifications').disabled = true;
+          document.querySelector('#stopNotifications').disabled = false;
+        })
+        .catch(error => {
+          log('Argh! ' + error);
+        });
+      }
+
+      function onStopNotificationsButtonClick() {
+        log('Stopping Battery Level Notifications...');
+        batteryLevelCharacteristic.stopNotifications()
+        .then(_ => {
+          log('> Notifications stopped');
+          document.querySelector('#startNotifications').disabled = false;
+          document.querySelector('#stopNotifications').disabled = true;
+        })
+        .catch(error => {
+          log('Argh! ' + error);
+        });
+      }
+
+      function onResetButtonClick() {
+        if (batteryLevelCharacteristic) {
+          batteryLevelCharacteristic.removeEventListener('characteristicvaluechanged',
+              handleBatteryLevelChanged);
+          batteryLevelCharacteristic = null;
+        }
+        // Note that it doesn't disconnect device.
+        bluetoothDevice = null;
+        log('> Bluetooth Device reset');
+      }
+
+      function onDisconnected() {
+        console.log('> Bluetooth Device disconnected');
+        $("#device").html("No device appaired")
+        connectDeviceAndCacheCharacteristics()
+        .catch(error => {
+          log('Argh! ' + error);
+        });
+      }
+
+      /* Utils */
+
+      function anyNamedDevice() {
+        // This is the closest we can get for now to get all devices.
+        // https://github.com/WebBluetoothCG/web-bluetooth/issues/234
+        return Array.from('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            .map(c => ({namePrefix: c}))
+            .concat({name: ''});
+      }
+
+      function handleNotifications(event) {
+        if (event.target.value.byteLength > 0){
+
+          console.log(event.target.value[0],event.target.value[1],event.target.value[2])
+          
+          var requestTypeId = (new Uint16Array(event.target.value.buffer.slice(0,4))[0].toString(16).length == 3) ? "0"+(new Uint16Array(event.target.value.buffer.slice(0,4))[0].toString(16)): new Uint16Array(event.target.value.buffer.slice(0,4))[0].toString(16) ;
+          var matchRequestID = new Uint16Array(event.target.value.buffer.slice(0,4))[1].toString(16);
+          var requestStatus = event.target.value.getInt8(4);
+          if (parseInt(requestStatus) != 0){
+            alert("Error occured during Healthbox measure, please try again.")
+            return;
+          }
+
+          var options = {
+              weekday: "long", year: "numeric", month: "short",
+              day: "numeric", hour: "2-digit", minute: "2-digit"
+          };
+
+          if (requestTypeId == "0105"){
+            var value = event.target.value.getFloat32(5,true).toFixed(1);
+            var date = new Date().toLocaleTimeString("en-us", options)
+            $("#tempResult").empty();
+            $("<h1 class='display-3 text-xs-center'>"+value+"<small>°C</small></h1>").appendTo("#tempResult");
+          }else if (requestTypeId == "0106"){
+            var value = (event.target.value.getFloat32(5,true)/100).toFixed(0);
+            $("#pressureResult").empty();
+            $("<h1 class='display-3 text-xs-center'>"+value+"<small>hPa</small></h1>").appendTo("#pressureResult");
+          }else if (requestTypeId == "0107"){
+            var value = event.target.value.getFloat32(5,true).toFixed(0);
+            $("#humidityResult").empty();
+            $("<h1 class='display-3 text-xs-center'>"+value+"<small>%</small></h1>").appendTo("#humidityResult");
+          }else if (requestTypeId == "0101"){
+            var value = event.target.value.getFloat32(5,true).toFixed(0);
+            $("#rfResult").empty();
+            $("<h1 class='display-3 text-xs-center'>"+value+"<small>dBm</small></h1>").appendTo("#rfResult");
+          }else if (requestTypeId == "0102"){
+            var value = event.target.value.getUint16(5,true).toFixed(0);
+            $("#uvaResult").empty();
+            $(value+"<small>µWatts/cm2</small>").appendTo("#uvaResult");
+          }else if (requestTypeId == "0103"){
+            var value = event.target.value.getUint16(5,true).toFixed(0);
+            $("#uvaResult").empty();
+            $(value+"<small>µWatts/cm2</small>").appendTo("#uvaResult");
+          }else if (requestTypeId == "0104"){
+            var value = event.target.value.getFloat32(5,true).toFixed(0);
+            $("#rfResult").empty();
+            $(value+"<small>UV index</small>").appendTo("#uviResult");
+          }  
+        }else{
+          console.log("Received acknowledge from write request")
+        }
+        
+        //alert(event.target.value)
+      }
+
+      function makeChart(value) {
+        console.log("in makechart")
+        var chart = AmCharts.makeChart("chartdiv", {
+          "theme": "light",
+          "type": "gauge",
+          "axes": [{
+            "topTextFontSize": 20,
+            "topTextYOffset": 70,
+            "axisColor": "#31d6ea",
+            "axisThickness": 1,
+            "endValue": 100,
+            "gridInside": true,
+            "inside": true,
+            "radius": "50%",
+            "valueInterval": 10,
+            "tickColor": "#67b7dc",
+            "startAngle": -90,
+            "endAngle": 90,
+            "unit": "%",
+            "bandOutlineAlpha": 0,
+            "bands": [{
+              "color": "#0080ff",
+              "endValue": 100,
+              "innerRadius": "105%",
+              "radius": "170%",
+              "gradientRatio": [0.5, 0, -0.5],
+              "startValue": 0
+            }, {
+              "color": "#3cd3a3",
+              "endValue": 0,
+              "innerRadius": "105%",
+              "radius": "170%",
+              "gradientRatio": [0.5, 0, -0.5],
+              "startValue": 0
+            }]
+          }],
+          "arrows": [{
+            "alpha": 1,
+            "innerRadius": "35%",
+            "nailRadius": 0,
+            "radius": "170%"
+          }]
+        });
+         chart.arrows[0].setValue(75);
+        chart.axes[0].setTopText(75 + " %");
+        // adjust darker band to new value
+        chart.axes[0].bands[1].setEndValue(75);
+        /*$('#collapseExample').collapse('toggle');*/
+      }
+
+    </script>
+    
+  </body>
+</html>

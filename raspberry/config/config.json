@@ -1,0 +1,76 @@
+{
+	"leds": [
+		{
+			"value": "0000",
+			"color": "blue",
+			"pin": 0,
+			"function": "BLE connection",
+			"duration": 999000,
+			"blink": 500,
+			"responseBytes": 999
+		},
+		{
+			"value": "0102",
+			"color": "yellow",
+			"pin": 1,
+			"function": "UVA sensor",
+			"duration": 6000,
+			"blink": 1000,
+			"responseBytes": 2
+		},
+		{
+			"value": "0103",
+			"color": "yellow",
+			"pin": 1,
+			"function": "UVB sensor",
+			"duration": 4000,
+			"blink": 500,
+			"responseBytes": 2
+		},
+		{
+			"value": "0104",
+			"color": "yellow",
+			"pin": 1,
+			"function": "UVI sensor",
+			"duration": 6000,
+			"blink": 2000,
+			"responseBytes": 4
+		},
+		{
+			"value": "0105",
+			"color": "green",
+			"pin": 2,
+			"function": "Temperature sensor",
+			"duration": 4000,
+			"blink": 500,
+			"responseBytes": 4
+		},
+		{
+			"value": "0106",
+			"color": "green",
+			"pin": 2,
+			"function": "Pressure sensor",
+			"duration": 4000,
+			"blink": 1000,
+			"responseBytes": 4
+		},
+		{
+			"value": "0107",
+			"color": "green",
+			"pin": 2,
+			"function": "Humidity sensor",
+			"duration": 4000,
+			"blink": 1500,
+			"responseBytes": 4
+		},
+		{
+			"value": "0101",
+			"color": "red",
+			"pin": 3,
+			"function": "RF Meter sensor",
+			"duration": 5000,
+			"blink": 700,
+			"responseBytes": 4
+		}
+	]
+}
