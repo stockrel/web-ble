@@ -31,7 +31,7 @@ FifoCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResp
   utils.log("Receiving Buffer "+data,"unknown");
   utils.log("Decoded buffer is request #"+requestID+" for sensor ID "+requestTypeID,"unknown");
   lightLed(requestTypeID,requestID,this._updateValueCallback);
-  callback(this.RESULT_SUCCESS);
+  callback(this.RESULT_SUCCESS,Buffer.allocUnsafe(-1));
 };
 
 
@@ -107,9 +107,18 @@ function constructResponse(requestTypeID,requestID){
     buf.writeFloatLE(value,0);
   }else if (requestTypeID == "0102"){
     var value = (Math.random() * (30.000000 - 20.000000) + 20.000000).toFixed(6)
-    console.log("Humidity - return value "+value)
+    console.log("UVA - return value "+value)
+    buf.writeUInt16LE(value,0);
+  }else if (requestTypeID == "0103"){
+    var value = (Math.random() * (30.000000 - 20.000000) + 20.000000).toFixed(6)
+    console.log("UVB - return value "+value)
+    buf.writeUInt16LE(value,0);
+  }else if (requestTypeID == "0104"){
+    var value = (Math.random() * (30.000000 - 20.000000) + 20.000000).toFixed(6)
+    console.log("UVI - return value "+value)
     buf.writeFloatLE(value,0);
   }
+
   // console.log(buf)
   // console.log(rawBuffer)
   // console.log(requestTypeID,requestID)

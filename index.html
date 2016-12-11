@@ -73,7 +73,7 @@
             </div>
           </div>
           <div class="row"> 
-            <div class="card card-block col-xs-6">
+            <div class="card card-block col-xs-4">
               <h4 class="card-title"><i class="fa fa-signal" aria-hidden="true"></i>&nbsp;Radio frequencies</h4>
               <h6 class="card-subtitle text-muted">Measure the strength of the ambient radio frequencies you are exposed to</h6>
               <p class="card-text float-xs-center" id="rfResult">
@@ -83,19 +83,16 @@
               </p>
               <a class="btn btn-sm btn-danger float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0101');">Measure</a>
             </div>
-            <div class="card card-block col-xs-6">
+            <div class="card card-block col-xs-8">
               <h4 class="card-title"><i class="fa fa-sun-o" aria-hidden="true"></i>&nbsp;UV indexes</h4>
               <h6 class="card-subtitle text-muted">Measure UV indexes you are exposed to</h6>
               <p class="card-text float-xs-center row" id="uvResult">
-                 <h3 class="display-5 text-xs-center col-sm-4" id="uvaResult">           
-                 <!--  UVA<small>µWatts/cm2</small> -->
+                 <!-- <h3 class="display-5 text-xs-center col-sm-4" id="uvaResult">           
                 </h3>
                 <h3 class="display-5 text-xs-center col-sm-4" id="uvbResult">           
-                  <!-- UVB<small>µWatts/cm2</small> -->
                 </h3>
                 <h3 class="display-5 text-xs-center col-sm-4" id="uviResult">           
-                  <!-- <small>UV index</small> -->
-                </h3>
+                </h3> -->
               </p>
                <a class="btn btn-sm btn-warning float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0104');">Measure UVI</a>
               <a class="btn btn-sm btn-warning float-xs-right disabled btn-measure" style="color:white;" onclick="writeToDevice('0103');">Measure UVB</a>
@@ -146,6 +143,7 @@
       var fifoCharacteristic;
       var requestID = 1234;
       var measures = [];
+      var requestIds = [];
 
       function requestAndConnectDevice() {
         return (bluetoothDevice ? Promise.resolve() : requestDevice())
@@ -205,6 +203,7 @@
         })
         .then(_ => {
           console.log('> Notifications started');
+          init();
         })
         // .then(_ => {
         //   fifoCharacteristic.writeValue(new Uint16Array([parseInt(0x0105, 16),parseInt(0001, 16),parseInt(0x0106, 16),parseInt(0002, 16),parseInt(0x0107, 16),parseInt(0001, 16)]).buffer)
@@ -260,11 +259,56 @@
         return "toto";
       }
 
-
+      function init(){
+        // requestIds.push(requestID)
+        measures.push({
+          requestID: requestID,
+          requestTypeId: '0105',
+          result: null
+        })
+        fifoCharacteristic.writeValue(new Uint16Array([parseInt('0105', 16),parseInt(requestID, 16)]).buffer)
+        .then(_ => {
+          requestID++;
+          // requestIds.push(requestID)
+           measures.push({
+              requestID: requestID,
+              requestTypeId: '0106',
+              result: null
+            })
+            fifoCharacteristic.writeValue(new Uint16Array([parseInt('0106', 16),parseInt(requestID, 16)]).buffer)
+            .then(_ => {
+              requestID++;
+              // requestIds.push(requestID)
+               measures.push({
+                  requestID: requestID,
+                  requestTypeId: '0107',
+                  result: null
+                })
+                fifoCharacteristic.writeValue(new Uint16Array([parseInt('0107', 16),parseInt(requestID, 16)]).buffer)
+                .then(_ => {
+                  requestID++;
+                  
+                  console.log('Your measure has been sent to Meerky Healthbox');
+                })
+                .catch(error => {
+                  alert('Argh! ' + error);
+                });
+              console.log('Your measure has been sent to Meerky Healthbox');
+            })
+            .catch(error => {
+              alert('Argh! ' + error);
+            });
+          console.log('Your measure has been sent to Meerky Healthbox');
+        })
+        .catch(error => {
+          alert('Argh! ' + error);
+        });
+      }
 
       function writeToDevice(hex) {
         // makeChart();
         // $('#collapseExample').collapse('toggle');
+        
         measures.push({
           requestID: requestID,
           requestTypeId: hex,
@@ -280,7 +324,7 @@
         //   console.log('> Notifications started');
         // })
         .catch(error => {
-          log('Argh! ' + error);
+          alert('Argh! ' + error);
         });
 
         //$("<span>"+res+"<br></span>").appendTo("#console");
@@ -351,6 +395,7 @@
       }
 
       function handleNotifications(event) {
+        console.log(event);
         if (event.target.value.byteLength > 0){
 
           console.log(event.target.value[0],event.target.value[1],event.target.value[2])
@@ -367,37 +412,47 @@
               weekday: "long", year: "numeric", month: "short",
               day: "numeric", hour: "2-digit", minute: "2-digit"
           };
-
-          if (requestTypeId == "0105"){
-            var value = event.target.value.getFloat32(5,true).toFixed(1);
-            var date = new Date().toLocaleTimeString("en-us", options)
-            $("#tempResult").empty();
-            $("<h1 class='display-3 text-xs-center'>"+value+"<small>°C</small></h1>").appendTo("#tempResult");
-          }else if (requestTypeId == "0106"){
-            var value = (event.target.value.getFloat32(5,true)/100).toFixed(0);
-            $("#pressureResult").empty();
-            $("<h1 class='display-3 text-xs-center'>"+value+"<small>hPa</small></h1>").appendTo("#pressureResult");
-          }else if (requestTypeId == "0107"){
-            var value = event.target.value.getFloat32(5,true).toFixed(0);
-            $("#humidityResult").empty();
-            $("<h1 class='display-3 text-xs-center'>"+value+"<small>%</small></h1>").appendTo("#humidityResult");
-          }else if (requestTypeId == "0101"){
-            var value = event.target.value.getFloat32(5,true).toFixed(0);
-            $("#rfResult").empty();
-            $("<h1 class='display-3 text-xs-center'>"+value+"<small>dBm</small></h1>").appendTo("#rfResult");
-          }else if (requestTypeId == "0102"){
-            var value = event.target.value.getUint16(5,true).toFixed(0);
-            $("#uvaResult").empty();
-            $(value+"<small>µWatts/cm2</small>").appendTo("#uvaResult");
-          }else if (requestTypeId == "0103"){
-            var value = event.target.value.getUint16(5,true).toFixed(0);
-            $("#uvaResult").empty();
-            $(value+"<small>µWatts/cm2</small>").appendTo("#uvaResult");
-          }else if (requestTypeId == "0104"){
-            var value = event.target.value.getFloat32(5,true).toFixed(0);
-            $("#rfResult").empty();
-            $(value+"<small>UV index</small>").appendTo("#uviResult");
-          }  
+          console.log(requestIds)
+          console.log(requestID,requestTypeId,matchRequestID)
+          if (requestIds.indexOf(matchRequestID) == -1){
+            requestIds.push(matchRequestID)
+            if (requestTypeId == "0105"){
+              var value = event.target.value.getFloat32(5,true).toFixed(1);
+              var date = new Date().toLocaleTimeString("en-us", options)
+              $("#tempResult").empty();
+              $("<h1 class='display-3 text-xs-center'>"+value+"<small>°C</small></h1>").appendTo("#tempResult");
+            }else if (requestTypeId == "0106"){
+              var value = (event.target.value.getFloat32(5,true)/100).toFixed(0);
+              $("#pressureResult").empty();
+              $("<h1 class='display-3 text-xs-center'>"+value+"<small>hPa</small></h1>").appendTo("#pressureResult");
+            }else if (requestTypeId == "0107"){
+              var value = event.target.value.getFloat32(5,true).toFixed(0);
+              $("#humidityResult").empty();
+              $("<h1 class='display-3 text-xs-center'>"+value+"<small>%</small></h1>").appendTo("#humidityResult");
+            }else if (requestTypeId == "0101"){
+              var value = event.target.value.getFloat32(5,true).toFixed(0);
+              $("#rfResult").empty();
+              $("<h1 class='display-3 text-xs-center'>"+value+"<small>dBm</small></h1>").appendTo("#rfResult");
+            }else if (requestTypeId == "0102"){
+              console.log("in UVA")
+              var value = event.target.value.getUint16(5,true).toFixed(0);
+              //$("#uvResult").empty();
+              $("<h3 class='display-6 text-xs-center col-sm-4' id='uvaResult'>"+value+"<small>µWatts/cm2 (UVA)</small></h3>").appendTo("#uvResult");
+            }else if (requestTypeId == "0103"){
+              console.log("in UVB")
+              var value = event.target.value.getUint16(5,true).toFixed(0);
+              //$("#uvResult").empty();
+              $("<h3 class='display-6 text-xs-center col-sm-4' id='uvbResult'>"+value+"<small>µWatts/cm2 (UVB)</small></h3>").appendTo("#uvResult");
+            }else if (requestTypeId == "0104"){
+              console.log("in UVI")
+              var value = event.target.value.getFloat32(5,true).toFixed(0);
+              //$("#uvResult").empty();
+              $("<h3 class='display-6 text-xs-center col-sm-4' id='uviResult'>"+value+"<small>UV index</small></h3>").appendTo("#uvResult");
+            }  
+          }else{
+            console.log("command already processed")
+          }
+          
         }else{
           console.log("Received acknowledge from write request")
         }
